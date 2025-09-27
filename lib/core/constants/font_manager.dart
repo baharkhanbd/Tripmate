@@ -12,9 +12,9 @@ class FontManager {
   static const FontWeight w700 = FontWeight.w700;
 
   // Default Text Colors
-  static const Color mainTextColor = AppColors.dark1F2937;
-  static const Color subtitleColor = AppColors.dark1F2937;
-  static const Color subSubtitleColor = AppColors.teal9FC2CC;
+  static const Color mainTextColor = AppColors.primaryColor;
+  static const Color subtitleColor = AppColors.primaryColor;
+  static const Color subSubtitleColor = AppColors.primaryColor;
 
   // ================== Text Styles ==================
 
@@ -92,7 +92,7 @@ static TextStyle buttonTextRegular() => TextStyle(
       fontFamily: inter,
       fontSize: 16.sp,
       fontWeight: FontWeight.w400,
-      color: AppColors.white,
+      color: AppColors.backgroundColor2,
       height: 1.0,
       letterSpacing: 0.0,
     );// White Button Text (Regular, 16px)
@@ -100,7 +100,7 @@ static TextStyle whiteButtonText() => TextStyle(
       fontFamily: inter,
       fontSize: 16.sp,
       fontWeight: FontWeight.w400,
-      color: AppColors.white,       // text color
+      color: AppColors.backgroundColor1,       // text color
       height: 1.0,
       letterSpacing: 0.0,
     );

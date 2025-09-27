@@ -56,7 +56,7 @@ class CustomInputField extends StatelessWidget {
                 fontWeight: FontWeight.w400,
                 fontSize: 16.sp,
                 letterSpacing: 0,
-                color: AppColors.dark273E43,
+                color: AppColors.highlight,
               ),
               contentPadding: const EdgeInsets.all(10.0),
               border: OutlineInputBorder(

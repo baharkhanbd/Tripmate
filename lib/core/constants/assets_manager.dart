@@ -7,33 +7,19 @@ class ImageAssets {
   // ✅ General App Images
   static const String appLogo = "$imagePath/appicon.png";
   static const String appLogoWhite = "$imagePath/logo.png";
-   static const String profile = "$imagePath/bahar.jpg";
+  static const String profile = "$imagePath/bahar.jpg";
 }
 
 class IconAssets {
   // ✅ General App Images
   static const String appLogo = "$iconPath/appicon.png";
-  static const String appLogoWhite = "$iconPath/applogo.png";
-  static const String coin = "$iconPath/coin.png";
-  static const String doubleCoin = "$iconPath/doublecoin.png";
-  static const String history = "$iconPath/history.png";
-  static const String lock = "$iconPath/lock.png";
-  static const String receive = "$iconPath/reveive.png";
-  static const String send = "$iconPath/send.png";
-  static const String shop = "$iconPath/shop.png";
-  static const String security = "$iconPath/security.png";
-  static const String success = "$iconPath/success.png";
-  static const String card1 = "$iconPath/card1.png";
-  static const String card2 = "$iconPath/card2.png";
-   static const String product2 = "$iconPath/product2.png";
-      static const String product1 = "$iconPath/product1.png";
-         static const String product3 = "$iconPath/product3.png";
+ 
+  static const String google = "$iconPath/google.png";
 }
 
 class JsonAssets {
   static const String loading = "$jsonPath/success.json";
-   static const String error = "$jsonPath/error.json";
-   
+  static const String error = "$jsonPath/error.json";
 }
 
 class SvgAssets {

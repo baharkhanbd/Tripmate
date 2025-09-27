@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:tripmate/controller/auth/login_proivder.dart';
+import 'package:tripmate/controller/history/history_provder.dart';
 import 'package:tripmate/controller/scan/scan_provider.dart';
 import 'package:tripmate/view/auth/login_page.dart';
 import 'package:provider/provider.dart';
@@ -20,26 +22,20 @@ class MyApp extends StatelessWidget {
             
             ChangeNotifierProvider(create: (_) => LoginProvider()),
             
-              ChangeNotifierProvider(create: (_) => ScanProvider())
+              ChangeNotifierProvider(create: (_) => ScanProvider()),
+               ChangeNotifierProvider(create: (_) => HistoryProvder())
             
             ],
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
-            theme: ThemeData(
-              primaryColor: Colors.white,
-              scaffoldBackgroundColor: Colors.white,
-              appBarTheme: const AppBarTheme(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black, // AppBar text/icon color
-                elevation: 0,
-              ),
-              textTheme: const TextTheme(
-                bodyLarge: TextStyle(color: Colors.black),
-                bodyMedium: TextStyle(color: Colors.black),
-                bodySmall: TextStyle(color: Colors.black54),
-              ),
-              iconTheme: const IconThemeData(color: Colors.black),
-            ),
+          title: 'TripMate',
+          
+        
+          theme: ThemeData(
+            textTheme: GoogleFonts.interTextTheme(),
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+            useMaterial3: true,
+          ),
             home: const LoginPage(),
           ),
         );

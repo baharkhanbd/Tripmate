@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:tripmate/controller/scan/scan_provider.dart';
 import 'package:tripmate/model/scan_analysis.dart';
+import 'package:tripmate/core/constants/app_colors.dart';
 
 class PlaceDetails extends StatelessWidget {
   final String? capturedImagePath;
@@ -17,45 +18,34 @@ class PlaceDetails extends StatelessWidget {
     final analysis = scanProvider.analysis;
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: AppColors.backgroundColor1,
       body: CustomScrollView(
         slivers: [
-          // 🔝 AppBar with Image
+          // AppBar with Image
           SliverAppBar(
-            expandedHeight: 280.h,
+            expandedHeight: 300.h,
             floating: false,
             pinned: true,
+            backgroundColor: AppColors.backgroundColor2,
             leading: GestureDetector(
-              onTap: ()  {
+              onTap: () {
                 Navigator.pop(context);
                 scanProvider.clearAnalysis();
               },
               child: Container(
                 margin: EdgeInsets.all(8.w),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+                decoration: BoxDecoration(
+                  color: AppColors.backgroundColor1,
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.arrow_back, size: 22.sp, color: Colors.black87),
-              ),
-            ),
-            actions: [
-              GestureDetector(
-                onTap: () {
-                  // Delete functionality
-                  scanProvider.clearAnalysis();
-                  Navigator.of(context).pop();
-                },
-                child: Container(
-                  margin: EdgeInsets.all(8.w),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(Icons.delete_outline, size: 22.sp, color: Colors.red),
+                child: Icon(
+                  Icons.arrow_back,
+                  color: AppColors.iconColor,
+                  size: 22.sp,
                 ),
               ),
-            ],
+            ),
+             
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 decoration: BoxDecoration(
@@ -63,7 +53,7 @@ class PlaceDetails extends StatelessWidget {
                     image: capturedImagePath != null
                         ? FileImage(File(capturedImagePath!))
                         : const NetworkImage(
-                            "https://upload.wikimedia.org/wikipedia/commons/d/da/Taj-Mahal.jpg",
+                            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlqK1n6Xe3Budimutwt4yZ2YCXmNCCa66QLA&s",
                           ) as ImageProvider,
                     fit: BoxFit.cover,
                   ),
@@ -84,11 +74,11 @@ class PlaceDetails extends StatelessWidget {
             ),
           ),
 
-          // 🔻 Content
+          // Content
           SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsets.all(16.w),
-              child: analysis == null 
+              child: analysis == null
                   ? _buildLoadingState()
                   : _buildAnalysisContent(analysis),
             ),
@@ -109,7 +99,7 @@ class PlaceDetails extends StatelessWidget {
           "Loading analysis...",
           style: GoogleFonts.inter(
             fontSize: 16.sp,
-            color: Colors.grey,
+            color: AppColors.textColor1,
           ),
         ),
       ],
@@ -122,103 +112,83 @@ class PlaceDetails extends StatelessWidget {
       children: [
         // Title
         Text(
-          analysis.landmarkName.isNotEmpty 
-              ? analysis.landmarkName 
+          analysis.landmarkName.isNotEmpty
+              ? analysis.landmarkName
               : "Historical Landmark",
           style: GoogleFonts.inter(
-            fontSize: 24.sp,
+            fontSize: 22.sp,
             fontWeight: FontWeight.w600,
-            color: Colors.black87,
+            color: AppColors.textColor1,
           ),
         ),
         SizedBox(height: 12.h),
 
-        // Metadata Row
+        // Meta info row
         Row(
           children: [
-            Icon(Icons.location_on, size: 18.sp, color: Colors.grey),
-            SizedBox(width: 6.w),
-            Expanded(
-              child: Text(
-                analysis.location.isNotEmpty ? analysis.location : "Location not specified",
-                style: GoogleFonts.inter(fontSize: 14.sp, color: Colors.grey),
-              ),
+            Row(
+              children: [
+                Icon(Icons.location_on, size: 16.sp, color: AppColors.iconColor),
+                SizedBox(width: 4.w),
+                Text(
+                  analysis.location.isNotEmpty ? analysis.location : "Location not specified",
+                  style: GoogleFonts.inter(fontSize: 14.sp, color: AppColors.textColor1),
+                ),
+              ],
             ),
             if (analysis.yearCompleted.isNotEmpty) ...[
-              SizedBox(width: 20.w),
-              Icon(Icons.calendar_today, size: 18.sp, color: Colors.grey),
-              SizedBox(width: 6.w),
-              Text(
-                analysis.yearCompleted,
-                style: GoogleFonts.inter(fontSize: 14.sp, color: Colors.grey),
+              SizedBox(width: 24.w),
+              Row(
+                children: [
+                  Icon(Icons.business, size: 16.sp, color: AppColors.iconColor),
+                  SizedBox(width: 4.w),
+                  Text(
+                    analysis.yearCompleted,
+                    style: GoogleFonts.inter(fontSize: 14.sp, color: AppColors.textColor1),
+                  ),
+                ],
               ),
             ],
           ],
         ),
-        Divider(height: 32.h, color: Colors.grey.shade300),
 
-        // Historical Overview
-        if (analysis.historicalOverview.isNotEmpty) ...[
-          _buildSection(
-            "Historical Overview",
+        SizedBox(height: 16.h),
+        Divider(color: AppColors.disabled1),
+        SizedBox(height: 16.h),
+
+        // Description / Overview
+        if (analysis.historicalOverview.isNotEmpty)
+          Text(
             analysis.historicalOverview,
-            Icons.history,
+            style: GoogleFonts.inter(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w400,
+              height: 1.5,
+              color: AppColors.textColor1,
+            ),
           ),
-          SizedBox(height: 16.h),
-        ],
+        SizedBox(height: 24.h),
 
-        // Location
-        if (analysis.location.isNotEmpty) ...[
-          _buildSection(
-            "Location",
-            analysis.location,
-            Icons.location_on,
-          ),
-          SizedBox(height: 16.h),
-        ],
-
-        // Architectural Style
-        if (analysis.architecturalStyle.isNotEmpty) ...[
-          _buildSection(
-            "Architecture",
-            analysis.architecturalStyle,
-            Icons.architecture,
-          ),
-          SizedBox(height: 16.h),
-        ],
-
-        // Materials
-        if (analysis.materials.isNotEmpty) ...[
-          _buildSection(
-            "Materials",
-            analysis.materials,
-            Icons.construction,
-          ),
-          SizedBox(height: 16.h),
-        ],
-
-        // Cultural Impact
-        if (analysis.culturalImpact.isNotEmpty) ...[
-          _buildSection(
-            "Cultural Impact",
-            analysis.culturalImpact,
-            Icons.people,
-          ),
-          SizedBox(height: 16.h),
-        ],
-
-        // Famous For
+        // Sections
+        if (analysis.location.isNotEmpty)
+          _buildSection("Location", analysis.location, Icons.location_on),
+        if (analysis.architecturalStyle.isNotEmpty)
+          _buildSection("Architecture", analysis.architecturalStyle, Icons.architecture),
+        if (analysis.materials.isNotEmpty)
+          _buildSection("Construction", analysis.materials, Icons.construction),
+        if (analysis.culturalImpact.isNotEmpty)
+          _buildSection("Cultural Impact", analysis.culturalImpact, Icons.people),
         if (analysis.famousFor.isNotEmpty) ...[
           Row(
             children: [
-              Icon(Icons.star, size: 18.sp, color: Colors.blue),
+              Icon(Icons.star, size: 18.sp, color: AppColors.highlight),
               SizedBox(width: 8.w),
               Text(
                 "Famous For:",
                 style: GoogleFonts.inter(
                   fontSize: 16.sp,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.blue,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.highlight,
                 ),
               ),
             ],
@@ -233,34 +203,15 @@ class PlaceDetails extends StatelessWidget {
                   item,
                   style: GoogleFonts.inter(fontSize: 12.sp),
                 ),
-                backgroundColor: Colors.blue.shade50,
+                backgroundColor: AppColors.highlight.withOpacity(0.2),
               );
             }).toList(),
           ),
           SizedBox(height: 24.h),
         ],
 
-        // Additional Info
-        Row(
-          children: [
-            Icon(Icons.info, size: 18.sp, color: Colors.blue),
-            SizedBox(width: 8.w),
-            Text(
-              "Additional Information:",
-              style: GoogleFonts.inter(
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w600,
-                color: Colors.blue,
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 8.h),
-        Text(
-          "This analysis was generated using advanced image recognition technology.",
-          style: GoogleFonts.inter(fontSize: 14.sp, color: Colors.black87),
-        ),
-        SizedBox(height: 32.h),
+         
+         
       ],
     );
   }
@@ -271,28 +222,30 @@ class PlaceDetails extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(icon, size: 18.sp, color: Colors.blue),
+            Icon(icon, size: 18.sp, color: AppColors.highlight),
             SizedBox(width: 8.w),
             Text(
               title,
               style: GoogleFonts.inter(
                 fontSize: 16.sp,
-                fontWeight: FontWeight.w600,
-                color: Colors.blue,
+                fontWeight: FontWeight.w700,
+                color: AppColors.highlight,
               ),
             ),
           ],
         ),
-        SizedBox(height: 6.h),
+        SizedBox(height: 8.h),
         Text(
           content,
           style: GoogleFonts.inter(
             fontSize: 14.sp,
-            color: Colors.black87,
-            height: 1.4,
+            fontWeight: FontWeight.w400,
+            color: AppColors.textColor1,
           ),
         ),
+        SizedBox(height: 16.h),
       ],
     );
   }
+ 
 }

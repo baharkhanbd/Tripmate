@@ -1,4 +1,3 @@
- 
 // import 'dart:convert';
 // import 'dart:io';
 // import 'package:flutter/material.dart';
@@ -84,31 +83,30 @@
 //   }
 
 //   /// Upload scan image
-//   Future<void> uploadScan({
+//   Future<int> uploadScan({
 //     required File imageFile,
 //     required String language,
+//     required String cameraType,
 //   }) async {
 //     isLoading = true;
 //     notifyListeners();
+
+//     int statusCode = 0;
 
 //     try {
 //       String? token = SharedPrefHelper.getToken();
 //       String lat = latitude?.toString() ?? '0.0';
 //       String long = longitude?.toString() ?? '0.0';
 
-//       // Dev or production URL
 //       String url = "https://ppp7rljm-8000.inc1.devtunnels.ms/api/scans/scan/";
-
-//       // Mime type
 //       final mimeType = lookupMimeType(imageFile.path) ?? 'image/jpeg';
 //       final mimeSplit = mimeType.split('/');
 
 //       var request = http.MultipartRequest('POST', Uri.parse(url));
 //       request.headers['Authorization'] = 'Bearer $token';
-
 //       request.fields['latitude'] = lat;
 //       request.fields['longitude'] = long;
-//       request.fields['source'] = 'camera';
+//       request.fields['source'] = cameraType;
 //       request.fields['language'] = language;
 
 //       request.files.add(
@@ -119,22 +117,20 @@
 //         ),
 //       );
 
-//       // Debug print request
+//       //       // Debug print request
 //       debugPrint("📌 Request Fields:");
 //       request.fields.forEach((key, value) => debugPrint("$key: $value"));
 
 //       debugPrint("📌 Request Files:");
-//       request.files.forEach((file) {
+//       for (var file in request.files) {
 //         debugPrint(
 //           "${file.field}: ${file.filename}, contentType: ${file.contentType}",
 //         );
-//       });
+//       }
 
 //       var response = await request.send();
-      
+//       statusCode = response.statusCode;
 //       final respStr = await response.stream.bytesToString();
-
-//       // FlutterDebugLogger for pretty JSON print
 //       FlutterDebugLogger.printJsonResponse(
 //         url: url,
 //         method: Method.POST,
@@ -143,10 +139,6 @@
 //         responseBody: respStr,
 //       );
 
-//       debugPrint("📌 Response Status Code: ${response.statusCode}");
-//       debugPrint("📌 Response Body: $respStr");
-
-//       // Parse JSON response
 //       if (respStr.isNotEmpty) {
 //         try {
 //           final Map<String, dynamic> resData = Map<String, dynamic>.from(
@@ -156,14 +148,10 @@
 //           if (resData.containsKey('analysis')) {
 //             analysis = ScanAnalysis.fromJson(resData['analysis']);
 //             notifyListeners();
-//           } else {
-//             debugPrint("❌ 'analysis' key not found in response");
 //           }
 //         } catch (e) {
 //           debugPrint("JSON Parse Error: $e");
 //         }
-//       } else {
-//         debugPrint("❌ Response is empty");
 //       }
 //     } catch (e) {
 //       debugPrint("Upload Scan Error: $e");
@@ -171,6 +159,8 @@
 //       isLoading = false;
 //       notifyListeners();
 //     }
+
+//     return statusCode;
 //   }
 
 //   /// Clear last scan analysis
@@ -179,7 +169,7 @@
 //     notifyListeners();
 //   }
 // }
- 
+
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -264,54 +254,64 @@ class ScanProvider extends ChangeNotifier {
     ).then((value) => value ?? false);
   }
 
-  /// Upload scan image
- Future<int> uploadScan({
-  required File imageFile,
-  required String language,
-}) async {
-  isLoading = true;
-  notifyListeners();
+  Future<int> uploadScan({
+    required File imageFile,
+    required String language,
+    required String cameraType,
+  }) async {
+    isLoading = true;
+    notifyListeners();
 
-  int statusCode = 0;
+    int statusCode = 0;
 
-  try {
-    String? token = SharedPrefHelper.getToken();
-    String lat = latitude?.toString() ?? '0.0';
-    String long = longitude?.toString() ?? '0.0';
+    try {
+      String? token = SharedPrefHelper.getToken();
 
-    String url = "https://ppp7rljm-8000.inc1.devtunnels.ms/api/scans/scan/";
-    final mimeType = lookupMimeType(imageFile.path) ?? 'image/jpeg';
-    final mimeSplit = mimeType.split('/');
+      // যদি gallery থেকে আসে তাহলে lat, long null পাঠানো হবে
+      String? lat = (cameraType.toLowerCase() == 'gallery')
+          ? null
+          : latitude?.toString() ?? '0.0';
+      String? long = (cameraType.toLowerCase() == 'gallery')
+          ? null
+          : longitude?.toString() ?? '0.0';
+      // Console-এ print করা
+      debugPrint("📍 Camera Type: $cameraType");
+      debugPrint("📍 Latitude: ${lat ?? 'null'}");
+      debugPrint("📍 Longitude: ${long ?? 'null'}");
+      String url = "https://ppp7rljm-8000.inc1.devtunnels.ms/api/scans/scan/";
+      final mimeType = lookupMimeType(imageFile.path) ?? 'image/jpeg';
+      final mimeSplit = mimeType.split('/');
 
-    var request = http.MultipartRequest('POST', Uri.parse(url));
-    request.headers['Authorization'] = 'Bearer $token';
-    request.fields['latitude'] = lat;
-    request.fields['longitude'] = long;
-    request.fields['source'] = 'camera';
-    request.fields['language'] = language;
+      var request = http.MultipartRequest('POST', Uri.parse(url));
+      request.headers['Authorization'] = 'Bearer $token';
 
-    request.files.add(
-      await http.MultipartFile.fromPath(
-        'image',
-        imageFile.path,
-        contentType: MediaType(mimeSplit[0], mimeSplit[1]),
-      ),
-    );
+      if (lat != null) request.fields['latitude'] = lat;
+      if (long != null) request.fields['longitude'] = long;
 
-//       // Debug print request
+      request.fields['source'] = cameraType;
+      request.fields['language'] = language;
+
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'image',
+          imageFile.path,
+          contentType: MediaType(mimeSplit[0], mimeSplit[1]),
+        ),
+      );
+
       debugPrint("📌 Request Fields:");
       request.fields.forEach((key, value) => debugPrint("$key: $value"));
 
       debugPrint("📌 Request Files:");
-      request.files.forEach((file) {
+      for (var file in request.files) {
         debugPrint(
           "${file.field}: ${file.filename}, contentType: ${file.contentType}",
         );
-      });
+      }
 
-    var response = await request.send();
-    statusCode = response.statusCode;
-    final respStr = await response.stream.bytesToString();
+      var response = await request.send();
+      statusCode = response.statusCode;
+      final respStr = await response.stream.bytesToString();
       FlutterDebugLogger.printJsonResponse(
         url: url,
         method: Method.POST,
@@ -320,30 +320,29 @@ class ScanProvider extends ChangeNotifier {
         responseBody: respStr,
       );
 
-    if (respStr.isNotEmpty) {
-      try {
-        final Map<String, dynamic> resData = Map<String, dynamic>.from(
-          jsonDecode(respStr),
-        );
+      if (respStr.isNotEmpty) {
+        try {
+          final Map<String, dynamic> resData = Map<String, dynamic>.from(
+            jsonDecode(respStr),
+          );
 
-        if (resData.containsKey('analysis')) {
-          analysis = ScanAnalysis.fromJson(resData['analysis']);
-          notifyListeners();
+          if (resData.containsKey('analysis')) {
+            analysis = ScanAnalysis.fromJson(resData['analysis']);
+            notifyListeners();
+          }
+        } catch (e) {
+          debugPrint("JSON Parse Error: $e");
         }
-      } catch (e) {
-        debugPrint("JSON Parse Error: $e");
       }
+    } catch (e) {
+      debugPrint("Upload Scan Error: $e");
+    } finally {
+      isLoading = false;
+      notifyListeners();
     }
-  } catch (e) {
-    debugPrint("Upload Scan Error: $e");
-  } finally {
-    isLoading = false;
-    notifyListeners();
+
+    return statusCode;
   }
-
-  return statusCode;
-}
-
 
   /// Clear last scan analysis
   void clearAnalysis() {
@@ -351,4 +350,3 @@ class ScanProvider extends ChangeNotifier {
     notifyListeners();
   }
 }
-
